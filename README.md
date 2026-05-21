@@ -1,0 +1,21 @@
+# office-hours
+
+An AI study assistant that answers questions about course material with citations to the source page. Powered by retrieval-augmented generation (RAG).
+
+## Status
+
+Day 1 of 10. Currently a single-file proof of concept that indexes one PDF and answers questions in the terminal. Backend, database, and web frontend coming this week.
+
+## Stack
+
+- **LLM:** Anthropic Claude (Sonnet 4.5)
+- **Embeddings:** Voyage AI (voyage-3)
+- **PDF parsing:** pypdf
+- **Vector math:** NumPy (in-memory for now; pgvector coming on day 3)
+
+## Running it locally
+
+1. `pip install -r requirements.txt`
+2. Add API keys to `.env` (see `.env.example`)
+3. Put a PDF in the project root as `doc.pdf`
+4. `python day1.py`
