@@ -2,10 +2,6 @@
 
 An AI study assistant that answers questions about course material with citations to the source page. Powered by retrieval-augmented generation (RAG).
 
-## Status
-
-Day 1 of 10. Currently a single-file proof of concept that indexes one PDF and answers questions in the terminal. Backend, database, and web frontend coming this week.
-
 ## Stack
 
 - **LLM:** Anthropic Claude (Sonnet 4.5)
