@@ -1,0 +1,16 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: office-hours-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: office_hours
+      POSTGRES_PASSWORD: dev_password_change_in_prod
+      POSTGRES_DB: office_hours
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

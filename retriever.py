@@ -1,26 +1,38 @@
 """
-Vector search over chunks. Pure NumPy for now — Postgres + pgvector on day 3.
+Vector search via Postgres + pgvector.
 """
 
 import numpy as np
+from db import get_connection
 
 
-def top_k(
-    query_vec: np.ndarray,
-    chunk_vecs: np.ndarray,
-    chunks: list[dict],
-    k: int = 5,
-) -> list[dict]:
+def top_k(query_vec: np.ndarray, k: int = 5) -> list[dict]:
     """
     Find the k chunks most similar to the query vector.
-    Returns the chunk dicts with a 'score' field added.
-    Voyage embeddings are pre-normalized, so dot product == cosine similarity.
+    Returns chunk dicts with doc name, page, text, and similarity score.
+
+    Uses pgvector's cosine distance operator (<=>).
+    Distance is 1 - cosine_similarity, so we convert it back for a score
+    that matches our day-2 interpretation (higher = more similar).
     """
-    similarities = chunk_vecs @ query_vec
-    top_indices = np.argsort(similarities)[::-1][:k]
-    results = []
-    for i in top_indices:
-        chunk = dict(chunks[i])
-        chunk["score"] = float(similarities[i])
-        results.append(chunk)
-    return results
+    with get_connection() as conn, conn.cursor() as cur:
+        cur.execute(
+            """
+            SELECT
+                documents.name AS doc,
+                chunks.page AS page,
+                chunks.text AS text,
+                1 - (chunks.embedding <=> %s) AS score
+            FROM chunks
+            JOIN documents ON documents.id = chunks.document_id
+            ORDER BY chunks.embedding <=> %s
+            LIMIT %s
+            """,
+            (query_vec, query_vec, k),
+        )
+        rows = cur.fetchall()
+
+    return [
+        {"doc": row[0], "page": row[1], "text": row[2], "score": float(row[3])}
+        for row in rows
+    ]
