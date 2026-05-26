@@ -15,6 +15,7 @@ export type Citation = {
   doc: string;
   page: number;
   score: number;
+  text: string;
 };
 
 export type AskResponse = {
@@ -56,4 +57,14 @@ export async function ask(question: string, k = 5): Promise<AskResponse> {
     throw new Error(err.detail || `Ask failed: ${res.status}`);
   }
   return res.json();
+}
+
+export async function deleteDocument(id: number): Promise<void> {
+  const res = await fetch(`${API_BASE}/documents/${id}`, {
+    method: "DELETE",
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: res.statusText }));
+    throw new Error(err.detail || `Delete failed: ${res.status}`);
+  }
 }

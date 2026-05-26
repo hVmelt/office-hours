@@ -1,7 +1,9 @@
 import { useState, useEffect, useRef } from "react";
-import { Upload, Send, FileText, Loader2 } from "lucide-react";
-import { listDocuments, uploadDocument, ask } from "./api";
+import { Upload, Send, FileText, Loader2, Trash2, Sun, Moon } from "lucide-react";
+import { listDocuments, uploadDocument, ask, deleteDocument } from "./api";
 import type { Document, Citation } from "./api";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import "./App.css";
 
 type Message = {
@@ -10,14 +12,62 @@ type Message = {
   citations?: Citation[];
 };
 
+function CitationList({ citations }: { citations: Citation[] }) {
+  const [expanded, setExpanded] = useState<number | null>(null);
+
+  return (
+    <div className="citations">
+      <div className="citation-chips">
+        {citations.map((c, j) => (
+          <button
+            key={j}
+            className={`citation ${expanded === j ? "active" : ""}`}
+            onClick={() => setExpanded(expanded === j ? null : j)}
+          >
+            {c.doc}, p.{c.page}
+          </button>
+        ))}
+      </div>
+      {expanded !== null && (
+        <div className="citation-preview">
+          <div className="citation-preview-header">
+            {citations[expanded].doc} — page {citations[expanded].page}
+          </div>
+          <div className="citation-preview-text">
+            {citations[expanded].text}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function App() {
   const [documents, setDocuments] = useState<Document[]>([]);
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<Message[]>(() => {
+    try {
+      const saved = localStorage.getItem("office-hours-chat");
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [theme, setTheme] = useState<"light" | "dark">(() => {
+  const saved = localStorage.getItem("office-hours-theme");
+  if (saved === "dark" || saved === "light") return saved;
+  // Default to user's OS preference
+  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+});
+
+useEffect(() => {
+  document.documentElement.setAttribute("data-theme", theme);
+  localStorage.setItem("office-hours-theme", theme);
+}, [theme]);
 
   // Load documents on mount
   useEffect(() => {
@@ -28,6 +78,11 @@ function App() {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  // Persist chat across page refreshes
+useEffect(() => {
+  localStorage.setItem("office-hours-chat", JSON.stringify(messages));
+}, [messages]);
 
   async function refreshDocuments() {
     try {
@@ -81,6 +136,16 @@ function App() {
     }
   }
 
+  async function handleDelete(id: number, name: string) {
+    if (!confirm(`Delete "${name}" and all its chunks?`)) return;
+    try {
+      await deleteDocument(id);
+      await refreshDocuments();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Delete failed");
+    }
+  }
+
   function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
@@ -91,8 +156,24 @@ function App() {
   return (
     <div className="app">
       <header className="header">
-        <h1>Office Hours</h1>
-        <p>Ask your course material anything.</p>
+        <div>
+          <h1>Office Hours</h1>
+          <p>Ask your course material anything.</p>
+        </div>
+        <div className="header-actions">
+          {messages.length > 0 && (
+            <button className="clear-btn" onClick={() => setMessages([])}>
+              Clear chat
+            </button>
+          )}
+          <button
+            className="theme-btn"
+            onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+            title={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
+          >
+            {theme === "light" ? <Moon size={16} /> : <Sun size={16} />}
+          </button>
+        </div>
       </header>
 
       <div className="layout">
@@ -103,14 +184,21 @@ function App() {
               <li className="empty">No documents indexed yet.</li>
             )}
             {documents.map((doc) => (
-              <li key={doc.id} className="doc-item">
-                <FileText size={16} />
-                <div>
-                  <div className="doc-name">{doc.name}</div>
-                  <div className="doc-meta">{doc.num_pages} pages</div>
-                </div>
-              </li>
-            ))}
+                <li key={doc.id} className="doc-item">
+                  <FileText size={16} />
+                  <div className="doc-info">
+                    <div className="doc-name">{doc.name}</div>
+                    <div className="doc-meta">{doc.num_pages} pages</div>
+                  </div>
+                  <button
+                    className="doc-delete"
+                    onClick={() => handleDelete(doc.id, doc.name)}
+                    title="Delete document"
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                </li>
+              ))}
           </ul>
 
           <label className="upload-btn">
@@ -147,15 +235,14 @@ function App() {
             )}
             {messages.map((msg, i) => (
               <div key={i} className={`message message-${msg.role}`}>
-                <div className="message-content">{msg.content}</div>
+                <div className="message-content">
+                  {msg.role === "assistant" ? (
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                    {msg.content}
+                  </ReactMarkdown>) : (msg.content)}
+                </div>
                 {msg.citations && msg.citations.length > 0 && (
-                  <div className="citations">
-                    {msg.citations.map((c, j) => (
-                      <span key={j} className="citation">
-                        {c.doc}, p.{c.page}
-                      </span>
-                    ))}
-                  </div>
+                  <CitationList citations={msg.citations} />
                 )}
               </div>
             ))}
@@ -170,7 +257,16 @@ function App() {
             <div ref={messagesEndRef} />
           </div>
 
-          {error && <div className="error">{error}</div>}
+          {error && (
+            <div className="error">
+              <div className="error-content">
+                <span className="error-label">Error:</span> {error}
+              </div>
+              <button className="error-dismiss" onClick={() => setError(null)}>
+                ×
+              </button>
+            </div>
+          )}
 
           <div className="input-row">
             <textarea

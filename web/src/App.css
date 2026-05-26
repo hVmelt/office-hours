@@ -1,3 +1,57 @@
+:root {
+  --bg-primary: #fafaf8;
+  --bg-secondary: white;
+  --bg-tertiary: #f5f5f3;
+  --bg-elevated: #f9f9f7;
+  --bg-hover: #f0efed;
+
+  --text-primary: #1a1a1a;
+  --text-secondary: #555;
+  --text-muted: #777;
+  --text-faint: #999;
+  --text-inverse: white;
+
+  --border-color: #e5e5e3;
+  --border-color-strong: #d4d4d2;
+
+  --accent: #1a1a1a;
+  --accent-hover: #333;
+
+  --error-bg: #fff0f0;
+  --error-border: #ffd0d0;
+  --error-text: #b00;
+  --error-hover-bg: #ffe0e0;
+  --error-icon-bg: #ffe8e8;
+  --error-icon-text: #c00;
+}
+
+[data-theme="dark"] {
+  --bg-primary: #1a1a1a;
+  --bg-secondary: #242424;
+  --bg-tertiary: #2a2a2a;
+  --bg-elevated: #2e2e2e;
+  --bg-hover: #333;
+
+  --text-primary: #f5f5f3;
+  --text-secondary: #c5c5c0;
+  --text-muted: #999;
+  --text-faint: #777;
+  --text-inverse: #1a1a1a;
+
+  --border-color: #383838;
+  --border-color-strong: #4a4a4a;
+
+  --accent: #f5f5f3;
+  --accent-hover: #ddd;
+
+  --error-bg: #3a1a1a;
+  --error-border: #5a2020;
+  --error-text: #ff8888;
+  --error-hover-bg: #4a2020;
+  --error-icon-bg: #4a1a1a;
+  --error-icon-text: #ff9999;
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -6,8 +60,9 @@
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  background: #fafaf8;
-  color: #1a1a1a;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background 0.2s, color 0.2s;
 }
 
 .app {
@@ -18,8 +73,11 @@ body {
 
 .header {
   padding: 1rem 2rem;
-  border-bottom: 1px solid #e5e5e3;
-  background: white;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .header h1 {
@@ -29,8 +87,40 @@ body {
 
 .header p {
   font-size: 0.85rem;
-  color: #777;
+  color: var(--text-muted);
   margin-top: 0.2rem;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.clear-btn,
+.theme-btn {
+  background: transparent;
+  border: 1px solid var(--border-color-strong);
+  color: var(--text-secondary);
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-family: inherit;
+  transition: all 0.15s;
+}
+
+.clear-btn:hover,
+.theme-btn:hover {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  border-color: var(--accent);
+}
+
+.theme-btn {
+  display: flex;
+  align-items: center;
+  padding: 0.4rem;
 }
 
 .layout {
@@ -42,8 +132,8 @@ body {
 /* ---------- Sidebar ---------- */
 .sidebar {
   width: 280px;
-  border-right: 1px solid #e5e5e3;
-  background: white;
+  border-right: 1px solid var(--border-color);
+  background: var(--bg-secondary);
   padding: 1.5rem 1rem;
   display: flex;
   flex-direction: column;
@@ -54,7 +144,7 @@ body {
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: #888;
+  color: var(--text-muted);
   margin-bottom: 0.75rem;
 }
 
@@ -66,7 +156,7 @@ body {
 
 .doc-list .empty {
   font-size: 0.85rem;
-  color: #999;
+  color: var(--text-faint);
   padding: 0.5rem 0;
 }
 
@@ -74,13 +164,18 @@ body {
   display: flex;
   align-items: center;
   gap: 0.6rem;
-  padding: 0.5rem 0.5rem;
+  padding: 0.5rem;
   border-radius: 6px;
   font-size: 0.9rem;
 }
 
 .doc-item:hover {
-  background: #f5f5f3;
+  background: var(--bg-tertiary);
+}
+
+.doc-info {
+  flex: 1;
+  min-width: 0;
 }
 
 .doc-name {
@@ -89,7 +184,30 @@ body {
 
 .doc-meta {
   font-size: 0.75rem;
-  color: #999;
+  color: var(--text-faint);
+}
+
+.doc-delete {
+  background: transparent;
+  border: none;
+  color: var(--text-faint);
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: all 0.15s;
+}
+
+.doc-item:hover .doc-delete {
+  opacity: 1;
+}
+
+.doc-delete:hover {
+  background: var(--error-icon-bg);
+  color: var(--error-icon-text);
 }
 
 .upload-btn {
@@ -99,8 +217,8 @@ body {
   gap: 0.5rem;
   margin-top: 1rem;
   padding: 0.6rem 1rem;
-  background: #1a1a1a;
-  color: white;
+  background: var(--accent);
+  color: var(--text-inverse);
   border-radius: 8px;
   cursor: pointer;
   font-size: 0.9rem;
@@ -109,7 +227,7 @@ body {
 }
 
 .upload-btn:hover {
-  background: #333;
+  background: var(--accent-hover);
 }
 
 /* ---------- Chat ---------- */
@@ -132,7 +250,7 @@ body {
 .welcome {
   margin: auto;
   text-align: center;
-  color: #888;
+  color: var(--text-muted);
   max-width: 400px;
 }
 
@@ -143,7 +261,7 @@ body {
 
 .welcome .hint {
   font-size: 0.85rem;
-  color: #aaa;
+  color: var(--text-faint);
   font-style: italic;
 }
 
@@ -156,14 +274,14 @@ body {
 
 .message-user {
   align-self: flex-end;
-  background: #1a1a1a;
-  color: white;
+  background: var(--accent);
+  color: var(--text-inverse);
 }
 
 .message-assistant {
   align-self: flex-start;
-  background: white;
-  border: 1px solid #e5e5e3;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
 }
 
 .message-content {
@@ -175,22 +293,111 @@ body {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: #888;
+  color: var(--text-muted);
 }
 
+/* Markdown inside assistant messages */
+.message-assistant .message-content p {
+  margin-bottom: 0.6rem;
+}
+
+.message-assistant .message-content p:last-child {
+  margin-bottom: 0;
+}
+
+.message-assistant .message-content ul,
+.message-assistant .message-content ol {
+  margin: 0.6rem 0 0.6rem 1.5rem;
+}
+
+.message-assistant .message-content li {
+  margin-bottom: 0.2rem;
+}
+
+.message-assistant .message-content strong {
+  font-weight: 600;
+}
+
+.message-assistant .message-content code {
+  background: var(--bg-hover);
+  padding: 0.1rem 0.3rem;
+  border-radius: 3px;
+  font-size: 0.85em;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.message-assistant .message-content pre {
+  background: var(--bg-tertiary);
+  padding: 0.75rem;
+  border-radius: 6px;
+  overflow-x: auto;
+  margin: 0.6rem 0;
+}
+
+.message-assistant .message-content h1,
+.message-assistant .message-content h2,
+.message-assistant .message-content h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0.75rem 0 0.4rem;
+}
+
+/* Citations */
 .citations {
+  margin-top: 0.75rem;
+}
+
+.citation-chips {
   display: flex;
   flex-wrap: wrap;
   gap: 0.4rem;
-  margin-top: 0.75rem;
 }
 
 .citation {
   font-size: 0.75rem;
-  padding: 0.2rem 0.5rem;
-  background: #f0efed;
+  padding: 0.25rem 0.6rem;
+  background: var(--bg-hover);
+  border: 1px solid transparent;
   border-radius: 4px;
-  color: #555;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+}
+
+.citation:hover {
+  background: var(--bg-tertiary);
+}
+
+.citation.active {
+  background: var(--bg-secondary);
+  border-color: var(--accent);
+  color: var(--text-primary);
+}
+
+.citation-preview {
+  margin-top: 0.6rem;
+  padding: 0.75rem;
+  background: var(--bg-elevated);
+  border-left: 3px solid var(--accent);
+  border-radius: 4px;
+  font-size: 0.85rem;
+}
+
+.citation-preview-header {
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
+.citation-preview-text {
+  line-height: 1.5;
+  color: var(--text-secondary);
+  max-height: 200px;
+  overflow-y: auto;
 }
 
 /* ---------- Input ---------- */
@@ -198,15 +405,17 @@ body {
   display: flex;
   gap: 0.5rem;
   padding: 1rem 2rem;
-  border-top: 1px solid #e5e5e3;
-  background: white;
+  border-top: 1px solid var(--border-color);
+  background: var(--bg-secondary);
 }
 
 .input-row textarea {
   flex: 1;
   resize: none;
   padding: 0.7rem 0.9rem;
-  border: 1px solid #d4d4d2;
+  border: 1px solid var(--border-color-strong);
+  background: var(--bg-primary);
+  color: var(--text-primary);
   border-radius: 8px;
   font-family: inherit;
   font-size: 0.95rem;
@@ -215,12 +424,12 @@ body {
 
 .input-row textarea:focus {
   outline: none;
-  border-color: #1a1a1a;
+  border-color: var(--accent);
 }
 
 .input-row button {
-  background: #1a1a1a;
-  color: white;
+  background: var(--accent);
+  color: var(--text-inverse);
   border: none;
   border-radius: 8px;
   padding: 0 1rem;
@@ -232,21 +441,50 @@ body {
 }
 
 .input-row button:hover:not(:disabled) {
-  background: #333;
+  background: var(--accent-hover);
 }
 
 .input-row button:disabled {
-  background: #ccc;
+  background: var(--border-color-strong);
   cursor: not-allowed;
 }
 
+/* ---------- Errors ---------- */
 .error {
-  padding: 0.6rem 1rem;
-  margin: 0 2rem;
-  background: #ffe8e8;
-  color: #b00;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  margin: 0 2rem 0.5rem;
+  background: var(--error-bg);
+  border: 1px solid var(--error-border);
+  color: var(--error-text);
   border-radius: 6px;
   font-size: 0.85rem;
+}
+
+.error-content {
+  flex: 1;
+}
+
+.error-label {
+  font-weight: 600;
+}
+
+.error-dismiss {
+  background: transparent;
+  border: none;
+  color: var(--error-text);
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0 0.4rem;
+  line-height: 1;
+  border-radius: 4px;
+}
+
+.error-dismiss:hover {
+  background: var(--error-hover-bg);
 }
 
 /* ---------- Animations ---------- */

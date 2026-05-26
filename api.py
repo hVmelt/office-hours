@@ -55,6 +55,7 @@ class Citation(BaseModel):
     doc: str
     page: int
     score: float
+    text: str
 
 
 class AskResponse(BaseModel):
@@ -180,7 +181,18 @@ def ask(req: AskRequest):
     return AskResponse(
         answer=answer_text,
         citations=[
-            Citation(doc=c["doc"], page=c["page"], score=c["score"])
+            Citation(doc=c["doc"], page=c["page"], score=c["score"], text=c["text"])
             for c in retrieved
         ],
     )
+
+@app.delete("/documents/{document_id}")
+def delete_document(document_id: int):
+    """Delete a document and all its chunks (cascade)."""
+    with get_connection() as conn, conn.cursor() as cur:
+        cur.execute("DELETE FROM documents WHERE id = %s RETURNING id", (document_id,))
+        result = cur.fetchone()
+        if result is None:
+            raise HTTPException(status_code=404, detail="Document not found.")
+        conn.commit()
+    return {"deleted": document_id}
