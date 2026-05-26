@@ -5,17 +5,62 @@ Each chunk knows which document and page it came from.
 
 from pathlib import Path
 from pypdf import PdfReader
+from collections import Counter
+
+
+def _find_repeated_lines(pages_text: list[str], min_pages_threshold: float = 0.5) -> set[str]:
+    """
+    Find lines that appear on a significant fraction of pages.
+    These are almost always headers, footers, page numbers, or running titles.
+
+    A line is "repeated" if it shows up on at least min_pages_threshold (default 50%)
+    of pages with text.
+    """
+    line_counts: Counter[str] = Counter()
+    for page_text in pages_text:
+        # dedupe within a page first — we want lines that repeat ACROSS pages,
+        # not lines that happen to be duplicated within one page
+        unique_lines = {line.strip() for line in page_text.split("\n") if line.strip()}
+        for line in unique_lines:
+            line_counts[line] += 1
+
+    threshold = max(2, int(len(pages_text) * min_pages_threshold))
+    return {line for line, count in line_counts.items() if count >= threshold}
+
+
+def _clean_page_text(text: str, junk_lines: set[str]) -> str:
+    """Remove header/footer lines from a page. Preserve paragraph structure."""
+    kept_lines = []
+    for line in text.split("\n"):
+        if line.strip() in junk_lines:
+            continue
+        kept_lines.append(line)
+    return "\n".join(kept_lines).strip()
 
 
 def load_pdf_pages(pdf_path: Path) -> list[dict]:
-    """Return [{page, text}] for every page that has text."""
+    """
+    Return [{page, text}] for every page that has text,
+    with repeated headers/footers stripped out.
+    """
     reader = PdfReader(str(pdf_path))
-    pages = []
+    raw_pages = []
     for i, page in enumerate(reader.pages, start=1):
         text = (page.extract_text() or "").strip()
         if text:
-            pages.append({"page": i, "text": text})
-    return pages
+            raw_pages.append({"page": i, "text": text})
+
+    # Detect lines that appear on many pages — these are headers/footers.
+    junk_lines = _find_repeated_lines([p["text"] for p in raw_pages])
+
+    # Strip those lines from each page.
+    cleaned = []
+    for page in raw_pages:
+        clean_text = _clean_page_text(page["text"], junk_lines)
+        if clean_text:  # only keep pages that still have content
+            cleaned.append({"page": page["page"], "text": clean_text})
+
+    return cleaned
 
 
 def chunk_text(

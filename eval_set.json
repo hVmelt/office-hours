@@ -1,0 +1,87 @@
+[
+  {
+    "question": "What is the difference between Sunni and Shia Muslims?",
+    "expected_doc": "islam",
+    "expected_pages": [7]
+  },
+  {
+    "question": "Who was Muhammad's wife Kadijah and what role did she play?",
+    "expected_doc": "islam",
+    "expected_pages": [6]
+  },
+  {
+    "question": "What was the Abbasid Revolution?",
+    "expected_doc": "islam",
+    "expected_pages": [11]
+  },
+  {
+    "question": "What is Convivencia?",
+    "expected_doc": "islam",
+    "expected_pages": [9, 10]
+  },
+  {
+    "question": "What happened at the Battle of Tours?",
+    "expected_doc": "islam",
+    "expected_pages": [10]
+  },
+  {
+    "question": "Who was Averroes and why does he matter?",
+    "expected_doc": "islam",
+    "expected_pages": [9]
+  },
+  {
+    "question": "What is the House of Wisdom?",
+    "expected_doc": "islam",
+    "expected_pages": [11]
+  },
+  {
+    "question": "When did the Mongols sack Baghdad?",
+    "expected_doc": "islam",
+    "expected_pages": [12]
+  },
+  {
+    "question": "Who was Clovis and how did he unify the Franks?",
+    "expected_doc": "medieval",
+    "expected_pages": [6]
+  },
+  {
+    "question": "What is Salic Law?",
+    "expected_doc": "medieval",
+    "expected_pages": [7]
+  },
+  {
+    "question": "What was the Donation of Pepin?",
+    "expected_doc": "medieval",
+    "expected_pages": [8]
+  },
+  {
+    "question": "How did Charlemagne become Holy Roman Emperor?",
+    "expected_doc": "medieval",
+    "expected_pages": [8]
+  },
+  {
+    "question": "Why did Vikings attack monasteries?",
+    "expected_doc": "medieval",
+    "expected_pages": [9, 10, 11]
+  },
+  {
+    "question": "What is the Mayor of the Palace?",
+    "expected_doc": "medieval",
+    "expected_pages": [7]
+  },
+  {
+    "question": "Why didn't the Byzantines try harder to retake northern Europe?",
+    "expected_doc": "medieval",
+    "expected_pages": [6]
+  },
+  {
+    "question": "How does feudalism work?",
+    "expected_doc": "medieval",
+    "expected_pages": [8]
+  },
+  {
+    "question": "What did Kant think about the Middle Ages?",
+    "expected_doc": "medieval",
+    "expected_pages": [3]
+  }
+]
