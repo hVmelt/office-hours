@@ -26,6 +26,16 @@ uvicorn api:app --reload                                     # start the API on 
 
 Then open http://localhost:8000/docs for interactive API documentation.
 
+## Running the frontend
+
+```bash
+cd web
+npm install
+npm run dev
+```
+
+Opens at http://localhost:5173. Requires the backend running on :8000.
+
 ### Endpoints
 
 - `GET /` — health check

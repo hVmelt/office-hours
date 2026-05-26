@@ -4,3 +4,11 @@ __pycache__/
 *.pyc
 .DS_Store
 cache/
+
+# Frontend
+web/node_modules/
+web/dist/
+
+# Frontend
+web/node_modules/
+web/dist/
