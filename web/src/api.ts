@@ -1,7 +1,7 @@
 // All HTTP calls to the backend live here.
 // Keeping them in one file makes it easy to swap base URLs, add auth, etc.
 
-const API_BASE = "http://localhost:8000";
+const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8000";
 
 export type Document = {
   id: number;
