@@ -227,9 +227,9 @@ useEffect(() => {
           <div className="messages">
             {messages.length === 0 && (
               <div className="welcome">
-                <p>Ask a question about your indexed course material.</p>
+                <p>Ask a question about your indexed course material or something totally unrelated.</p>
                 <p className="hint">
-                  Try: "What is the difference between Sunni and Shia Muslims?"
+                  Try: "Who is Batman"
                 </p>
               </div>
             )}
