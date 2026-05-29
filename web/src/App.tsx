@@ -184,12 +184,15 @@ useEffect(() => {
               <li className="empty">No documents indexed yet.</li>
             )}
             {documents.map((doc) => (
-                <li key={doc.id} className="doc-item">
-                  <FileText size={16} />
-                  <div className="doc-info">
-                    <div className="doc-name">{doc.name}</div>
-                    <div className="doc-meta">{doc.num_pages} pages</div>
+              <li key={doc.id} className="doc-item">
+                <FileText size={16} />
+                <div className="doc-info">
+                  <div className="doc-name">{doc.name}</div>
+                  <div className="doc-meta">
+                    {doc.num_pages} pages{doc.is_demo ? " · demo" : ""}
                   </div>
+                </div>
+                {!doc.is_demo && (
                   <button
                     className="doc-delete"
                     onClick={() => handleDelete(doc.id, doc.name)}
@@ -197,8 +200,9 @@ useEffect(() => {
                   >
                     <Trash2 size={14} />
                   </button>
-                </li>
-              ))}
+                )}
+              </li>
+            ))}
           </ul>
 
           <label className="upload-btn">

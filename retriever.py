@@ -6,10 +6,10 @@ import numpy as np
 from db import get_connection
 
 
-def top_k(query_vec: np.ndarray, k: int = 5) -> list[dict]:
+def top_k(query_vec: np.ndarray, k: int = 5, session_id: str | None = None) -> list[dict]:
     """
-    Find the k chunks most similar to the query vector.
-    Returns chunk dicts with doc name, page, text, and similarity score.
+    Find the k chunks most similar to the query vector, restricted to
+    documents that are either public demo docs or owned by this session.
 
     Uses pgvector's cosine distance operator (<=>).
     Distance is 1 - cosine_similarity, so we convert it back for a score
@@ -25,10 +25,11 @@ def top_k(query_vec: np.ndarray, k: int = 5) -> list[dict]:
                 1 - (chunks.embedding <=> %s) AS score
             FROM chunks
             JOIN documents ON documents.id = chunks.document_id
+            WHERE documents.is_demo = TRUE OR documents.session_id = %s
             ORDER BY chunks.embedding <=> %s
             LIMIT %s
             """,
-            (query_vec, query_vec, k),
+            (query_vec, session_id, query_vec, k),
         )
         rows = cur.fetchall()
 

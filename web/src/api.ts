@@ -3,12 +3,24 @@
 
 const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8000";
 
+// A stable per-browser session ID, generated once and persisted.
+// This is how the backend isolates each visitor's uploaded documents.
+function getSessionId(): string {
+  let id = localStorage.getItem("office-hours-session");
+  if (!id) {
+    id = crypto.randomUUID();
+    localStorage.setItem("office-hours-session", id);
+  }
+  return id;
+}
+
 export type Document = {
   id: number;
   name: string;
   filename: string;
   num_pages: number;
   indexed_at: string;
+  is_demo: boolean;
 };
 
 export type Citation = {
@@ -24,7 +36,9 @@ export type AskResponse = {
 };
 
 export async function listDocuments(): Promise<Document[]> {
-  const res = await fetch(`${API_BASE}/documents`);
+  const res = await fetch(`${API_BASE}/documents`, {
+    headers: { "X-Session-Id": getSessionId() },
+  });
   if (!res.ok) throw new Error(`Failed to list documents: ${res.status}`);
   return res.json();
 }
@@ -35,6 +49,7 @@ export async function uploadDocument(file: File): Promise<Document> {
 
   const res = await fetch(`${API_BASE}/documents`, {
     method: "POST",
+    headers: { "X-Session-Id": getSessionId() },
     body: formData,
   });
 
@@ -48,7 +63,10 @@ export async function uploadDocument(file: File): Promise<Document> {
 export async function ask(question: string, k = 5): Promise<AskResponse> {
   const res = await fetch(`${API_BASE}/ask`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      "X-Session-Id": getSessionId(),
+    },
     body: JSON.stringify({ question, k }),
   });
 
@@ -62,6 +80,7 @@ export async function ask(question: string, k = 5): Promise<AskResponse> {
 export async function deleteDocument(id: number): Promise<void> {
   const res = await fetch(`${API_BASE}/documents/${id}`, {
     method: "DELETE",
+    headers: { "X-Session-Id": getSessionId() },
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({ detail: res.statusText }));

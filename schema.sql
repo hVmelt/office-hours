@@ -6,8 +6,11 @@ CREATE TABLE IF NOT EXISTS documents (
     name TEXT UNIQUE NOT NULL,
     filename TEXT NOT NULL,
     num_pages INTEGER NOT NULL,
+    session_id TEXT,
+    is_demo BOOLEAN NOT NULL DEFAULT FALSE,
     indexed_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+CREATE INDEX IF NOT EXISTS documents_session_idx ON documents(session_id);
 -- One row per chunk; holds the embedding
 CREATE TABLE IF NOT EXISTS chunks (
     id SERIAL PRIMARY KEY,
